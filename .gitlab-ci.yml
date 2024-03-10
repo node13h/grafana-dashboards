@@ -61,7 +61,7 @@ build:
     - jsonnet -J vendor telegraf-system.jsonnet >"ci/build/telegraf-system-${VERSION_SEMVER}.json"
   artifacts:
     paths:
-      - build
+      - ci/build
     expire_in: 1 day
 
 
