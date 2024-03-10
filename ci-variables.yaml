@@ -1,0 +1,15 @@
+---
+description: Machine-readable documentation of CI variables
+variables:
+  GITHUB_OWNER:
+    type: string
+    description: Owner of the GitHub repo
+    required: true
+  GITHUB_REPO:
+    type: string
+    description: GitHub repo name
+    required: true
+  GITHUB_TOKEN:
+    type: string
+    description: Token with permissions for creating releases and assets in `GITHUB_REPO`
+    required: true
