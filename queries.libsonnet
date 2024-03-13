@@ -22,6 +22,22 @@ local variables = import './variables.libsonnet';
     + prometheusQuery.withRefId(type)
     + prometheusQuery.withLegendFormat(if legend != null then legend else type),
 
+  diskQueueDepth(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'rate(diskio_weighted_io_time{job="telegraf", host="$%s"}[$__rate_interval]) / 1000' % [variables.host.name]
+    )
+    + prometheusQuery.withRefId(id)
+    + prometheusQuery.withLegendFormat('{{name}}'),
+
+  diskLatency(type):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'rate(diskio_%s_time{job="telegraf", host="$%s"}[$__rate_interval]) / rate(diskio_%ss{job="telegraf", host="$%s"}[$__rate_interval])' % [type, variables.host.name, type, variables.host.name]
+    )
+    + prometheusQuery.withRefId(type)
+    + prometheusQuery.withLegendFormat('{{name}}'),
+
   hostMetric(metric, id, legend=null):
     prometheusQuery.new(
       '$' + variables.datasource.name,

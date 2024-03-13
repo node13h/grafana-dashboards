@@ -4,7 +4,7 @@ local panels = import './panels.libsonnet';
 local queries = import './queries.libsonnet';
 local variables = import './variables.libsonnet';
 
-g.dashboard.new('Telegraf / System (generated)')
+g.dashboard.new('Telegraf / System')
 + g.dashboard.withUid('c48241d7-6a20-41ee-8e4f-70c1729fcca1')
 + g.dashboard.withVariables([
   variables.datasource,
@@ -104,24 +104,27 @@ g.dashboard.new('Telegraf / System (generated)')
       g.panel.row.new('Disk IO')
       + g.panel.row.withCollapsed(true)
       + g.panel.row.withPanels([
+        panels.timeSeries.base('Average queue depth', [
+          { target: queries.diskQueueDepth('queue_depth') },
+        ], { h: 8, w: 24 }),
         panels.timeSeries.diskIops('Completed read IOPs', [
           { target: queries.hostRateMetric('diskio_reads', 'read', '{{name}}') },
-        ], { h: 8, w: 12 }),
-        panels.timeSeries.diskLatency('Read latency', [
-          { target: queries.hostRateMetric('diskio_read_time', 'read', '{{name}}') },
         ], { h: 8, w: 12, y: 8 }),
+        panels.timeSeries.diskLatency('Read latency', [
+          { target: queries.diskLatency('read') },
+        ], { h: 8, w: 12, y: 16 }),
         panels.timeSeries.diskThroughput('Read throughput', [
           { target: queries.hostRateMetric('diskio_read_bytes', 'read', '{{name}}') },
-        ], { h: 8, w: 12, y: 16 }),
+        ], { h: 8, w: 12, y: 24 }),
         panels.timeSeries.diskIops('Completed write IOPs', [
           { target: queries.hostRateMetric('diskio_writes', 'writes', '{{name}}') },
-        ], { h: 8, w: 12, x: 12 }),
-        panels.timeSeries.diskLatency('Write latency', [
-          { target: queries.hostRateMetric('diskio_write_time', 'read_time', '{{name}}') },
         ], { h: 8, w: 12, x: 12, y: 8 }),
-        panels.timeSeries.diskThroughput('Write throughput', [
-          { target: queries.hostRateMetric('diskio_write_bytes', 'read', '{{name}}') },
+        panels.timeSeries.diskLatency('Write latency', [
+          { target: queries.diskLatency('write') },
         ], { h: 8, w: 12, x: 12, y: 16 }),
+        panels.timeSeries.diskThroughput('Write throughput', [
+          { target: queries.hostRateMetric('diskio_write_bytes', 'write', '{{name}}') },
+        ], { h: 8, w: 12, x: 12, y: 24 }),
       ]),
 
       g.panel.row.new('CPU')
