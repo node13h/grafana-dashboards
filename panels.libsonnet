@@ -123,7 +123,8 @@ local overrides = import './overrides.libsonnet';
 
     cpuUsage(title, fields, gridPos, options={}):
       self.base(title, fields, gridPos, options=options)
-      + timeSeries.standardOptions.withUnit('percent'),
+      + timeSeries.standardOptions.withUnit('percent')
+      + timeSeries.standardOptions.withMax(100),
 
     diskUsage(title, fields, gridPos, options={}):
       self.base(title, fields, gridPos, options=options)
