@@ -72,6 +72,80 @@ local overrides = import './overrides.libsonnet';
       { targets: [], overrides: [] }
     ),
 
+  stat: {
+    local stat = g.panel.stat,
+
+    base(title, fields, gridPos, options={}):
+      local f = $.splitFields(fields);
+
+      stat.new(title)
+      + stat.queryOptions.withTargets(f.targets)
+      + stat.panelOptions.withGridPos(
+        h=std.get(gridPos, 'h', 8),
+        w=std.get(gridPos, 'w', 8),
+        x=std.get(gridPos, 'x', 0),
+        y=std.get(gridPos, 'y', 0)
+      ),
+
+    uptime(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.standardOptions.color.withMode('thresholds')
+      + stat.standardOptions.thresholds.withMode('absolute')
+      + stat.standardOptions.thresholds.withSteps(
+        [
+          { color: 'green', value: null },
+          { color: 'yellow', value: 7884000 },
+          { color: 'red', value: 15768000 },
+        ]
+      )
+      + stat.standardOptions.withUnit('dtdurations'),
+
+  },
+
+  table: {
+    local table = g.panel.table,
+
+    base(title, fields, gridPos, options={}):
+      local f = $.splitFields(fields);
+      local filterable = std.get(options, 'filterable', false);
+
+      table.new(title)
+      + table.queryOptions.withTargets(f.targets)
+      + table.fieldConfig.defaults.custom.withFilterable(filterable)
+      + table.panelOptions.withGridPos(
+        h=std.get(gridPos, 'h', 8),
+        w=std.get(gridPos, 'w', 8),
+        x=std.get(gridPos, 'x', 0),
+        y=std.get(gridPos, 'y', 0)
+      ),
+
+    diskUsageSummary(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options)
+      + table.standardOptions.color.withMode('thresholds')
+      + table.standardOptions.thresholds.withMode('absolute')
+      + table.standardOptions.thresholds.withSteps(
+        [
+          { color: 'super-light-green', value: null },
+          { color: 'semi-dark-red', value: 90 },
+        ]
+      )
+      + table.queryOptions.withTransformations([
+        table.queryOptions.transformation.withId('organize')
+        + table.queryOptions.transformation.withOptions(
+          {
+            excludeByName: { Time: true },
+            renameByName: { Value: 'Used', path: 'Mounted on' },
+          }
+        ),
+      ])
+      + table.standardOptions.withOverrides([
+        overrides.table.gauge('Used'),
+      ])
+      + table.standardOptions.withMin(0)
+      + table.standardOptions.withMax(100)
+      + table.standardOptions.withUnit('percent'),
+  },
+
   timeSeries: {
     local timeSeries = g.panel.timeSeries,
 

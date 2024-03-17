@@ -30,4 +30,15 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         + timeSeries.fieldConfig.defaults.custom.lineStyle.withFill('dot')
       ),
   },
+
+  table: {
+    local table = g.panel.table,
+
+    gauge(fieldName):
+      table.standardOptions.override.byName.new(fieldName)
+      + table.standardOptions.override.byName.withPropertiesFromOptions(
+        table.fieldConfig.defaults.custom.cellOptions.TableBarGaugeCellOptions.withMode('basic')
+        + table.fieldConfig.defaults.custom.cellOptions.TableBarGaugeCellOptions.withType('gauge')
+      ),
+  },
 }

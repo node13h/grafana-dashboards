@@ -6,10 +6,10 @@ local variables = import './variables.libsonnet';
 // TODO: move into "telegraf' parent key.
 
 {
-  cpuUsage(type, legend=null):
+  cpuUsage(type, legend=null, cpu='$%s' % variables.cpu.name):
     prometheusQuery.new(
       '$' + variables.datasource.name,
-      'cpu_usage_%s{job="telegraf", host="$%s", cpu="$%s"}' % [type, variables.host.name, variables.cpu.name]
+      'cpu_usage_%s{job="telegraf", host="$%s", cpu="%s"}' % [type, variables.host.name, cpu]
     )
     + prometheusQuery.withRefId(type)
     + prometheusQuery.withLegendFormat(if legend != null then legend else type),
@@ -69,4 +69,22 @@ local variables = import './variables.libsonnet';
     )
     + prometheusQuery.withRefId(id)
     + prometheusQuery.withLegendFormat(if legend != null then legend else id),
+
+  uptime(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'system_uptime{job="telegraf", host="$%s"}' % [variables.host.name]
+    )
+    + prometheusQuery.withRefId(id),
+
+  diskUsagePercentInstant(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      // Keep value and the path label only,
+      'max by (path) (disk_used_percent{job="telegraf", host="$%s"})' % [variables.host.name]
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withFormat('table')
+    + prometheusQuery.withRefId(id),
+
 }
