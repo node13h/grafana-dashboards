@@ -89,7 +89,7 @@ local variables = import './variables.libsonnet';
     prometheusQuery.new(
       '$' + variables.datasource.name,
       // Keep value and the path label only,
-      'max by (path) (disk_used_percent{job="telegraf", host="$%s"})' % [variables.host.name]
+      'max by (path) (disk_used_percent{job="telegraf", host="$%s", path=~"$%s"})' % [variables.host.name, variables.mountpoint.name]
     )
     + prometheusQuery.withInstant(true)
     + prometheusQuery.withFormat('table')
