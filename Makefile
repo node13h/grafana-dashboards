@@ -11,4 +11,7 @@ tag-pipeline: .gitlab-ci-local-variables.yml
 	./run-pipeline.sh tag $(GIT_TAG)
 
 update-deps:
-	./update-deps.sh
+	./run-local-task.sh update-deps
+
+reformat:
+	./run-local-task.sh reformat

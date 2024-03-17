@@ -1,0 +1,27 @@
+variables:
+  CI_JSONNET_IMAGE: docker.io/alikov/ci-jsonnet:0.2.7
+
+stages:
+  - task
+
+reformat:
+  stage: task
+  image: $CI_JSONNET_IMAGE
+  script:
+    - jsonnetfmt -i *.libsonnet *.jsonnet
+  artifacts:
+    paths:
+      - '**.libsonnet'
+      - '**.jsonnet'
+    expire_in: 1 day
+
+update-deps:
+  stage: task
+  image: $CI_JSONNET_IMAGE
+  script:
+    - jb update
+  artifacts:
+    paths:
+      - jsonnetfile.json
+      - jsonnetfile.lock.json
+    expire_in: 1 day
