@@ -23,6 +23,7 @@ local var = g.dashboard.variable;
     )
     + var.query.withRegex('/cpu[0-9]+/')
     + var.query.refresh.onTime()
+    + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(),
 
   mountpoint:
@@ -33,6 +34,7 @@ local var = g.dashboard.variable;
       'disk_total{job="telegraf", host="$%s"}' % self.host.name,
     )
     + var.query.refresh.onTime()
+    + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(),
 
 }
