@@ -11,6 +11,7 @@ g.dashboard.new('Telegraf / System')
   variables.host,
   variables.cpu,
   variables.disk,
+  variables.interface,
   variables.mountpoint,
 ])
 + g.dashboard.graphTooltip.withSharedCrosshair()
@@ -95,28 +96,28 @@ g.dashboard.new('Telegraf / System')
       + g.panel.row.withCollapsed(true)
       + g.panel.row.withPanels([
         panels.timeSeries.networkTraffic('Inbound traffic', [
-          { target: queries.hostRateMetric('net_bytes_recv', 'recv', '{{interface}}') },
+          { target: queries.networkRateMetric('bytes_recv') },
         ], { h: 8, w: 12 }),
         panels.timeSeries.networkPackets('Inbound packets', [
-          { target: queries.hostRateMetric('net_packets_recv', 'recv', '{{interface}}') },
+          { target: queries.networkRateMetric('packets_recv') },
         ], { h: 8, w: 12, y: 8 }),
         panels.timeSeries.networkPackets('Inbound packets dropped', [
-          { target: queries.hostRateMetric('net_drop_in', 'in', '{{interface}}') },
+          { target: queries.networkRateMetric('drop_in') },
         ], { h: 8, w: 12, y: 16 }),
         panels.timeSeries.networkPackets('Inbound errors', [
-          { target: queries.hostRateMetric('net_err_in', 'in', '{{interface}}') },
+          { target: queries.networkRateMetric('err_in') },
         ], { h: 8, w: 12, y: 24 }),
         panels.timeSeries.networkTraffic('Outbound traffic', [
-          { target: queries.hostRateMetric('net_bytes_sent', 'sent', '{{interface}}') },
+          { target: queries.networkRateMetric('bytes_sent') },
         ], { h: 8, w: 12, x: 12 }),
         panels.timeSeries.networkPackets('Outbound packets', [
-          { target: queries.hostRateMetric('net_packets_sent', 'sent', '{{interface}}') },
+          { target: queries.networkRateMetric('packets_sent') },
         ], { h: 8, w: 12, x: 12, y: 8 }),
         panels.timeSeries.networkPackets('Outbound packets dropped', [
-          { target: queries.hostRateMetric('net_drop_out', 'out', '{{interface}}') },
+          { target: queries.networkRateMetric('drop_out') },
         ], { h: 8, w: 12, x: 12, y: 16 }),
         panels.timeSeries.networkPackets('Outbound errors', [
-          { target: queries.hostRateMetric('net_err_out', 'out', '{{interface}}') },
+          { target: queries.networkRateMetric('err_out') },
         ], { h: 8, w: 12, x: 12, y: 24 }),
       ]),
 

@@ -70,6 +70,14 @@ local variables = import './variables.libsonnet';
     + prometheusQuery.withRefId(id)
     + prometheusQuery.withLegendFormat(if legend != null then legend else id),
 
+  networkRateMetric(metric):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'rate(net_%s{job="telegraf", host="$%s", interface=~"$%s"}[$__rate_interval])' % [metric, variables.host.name, variables.interface.name]
+    )
+    + prometheusQuery.withRefId(metric)
+    + prometheusQuery.withLegendFormat('{{interface}}'),
+
   uptime(id):
     prometheusQuery.new(
       '$' + variables.datasource.name,

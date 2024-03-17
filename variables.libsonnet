@@ -37,6 +37,17 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(),
 
+  interface:
+    var.query.new('interface')
+    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.queryTypes.withLabelValues(
+      'interface',
+      'net_bytes_recv{job="telegraf", host="$%s"}' % self.host.name,
+    )
+    + var.query.refresh.onTime()
+    + var.query.selectionOptions.withMulti(true)
+    + var.query.selectionOptions.withIncludeAll(),
+
   mountpoint:
     var.query.new('mountpoint')
     + var.query.withDatasourceFromVariable(self.datasource)
