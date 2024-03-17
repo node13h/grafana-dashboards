@@ -6,32 +6,28 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
 
     colored(refId, color):
       timeSeries.standardOptions.override.byQuery.new(refId)
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'color', { fixedColor: color, mode: 'fixed' }
+      + timeSeries.standardOptions.override.byType.withPropertiesFromOptions(
+        timeSeries.standardOptions.color.withFixedColor(color)
+        + timeSeries.standardOptions.color.withMode('fixed')
       ),
 
     availableResource(refId):
       timeSeries.standardOptions.override.byQuery.new(refId)
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'color', { fixedColor: 'light-green', mode: 'fixed' }
-      )
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'custom.fillOpacity', 20
-      )
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'custom.lineWidth', 0
+      + timeSeries.standardOptions.override.byType.withPropertiesFromOptions(
+        timeSeries.standardOptions.color.withFixedColor('light-green')
+        + timeSeries.standardOptions.color.withMode('fixed')
+        + timeSeries.fieldConfig.defaults.custom.withFillOpacity(20)
+        + timeSeries.fieldConfig.defaults.custom.withLineWidth(0)
       ),
 
     capacityLine(refId):
       timeSeries.standardOptions.override.byQuery.new(refId)
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'color', { fixedColor: 'gray', mode: 'fixed' }
-      )
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'custom.lineStyle', { dash: [0, 10], fill: 'dot' }
-      )
-      + timeSeries.standardOptions.override.byQuery.withProperty(
-        'custom.drawStyle', 'line'
+      + timeSeries.standardOptions.override.byType.withPropertiesFromOptions(
+        timeSeries.standardOptions.color.withFixedColor('gray')
+        + timeSeries.standardOptions.color.withMode('fixed')
+        + timeSeries.fieldConfig.defaults.custom.withDrawStyle('line')
+        + timeSeries.fieldConfig.defaults.custom.lineStyle.withDash([0, 10])
+        + timeSeries.fieldConfig.defaults.custom.lineStyle.withFill('dot')
       ),
   },
 }
