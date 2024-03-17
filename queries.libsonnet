@@ -25,7 +25,7 @@ local variables = import './variables.libsonnet';
   diskQueueDepth(id):
     prometheusQuery.new(
       '$' + variables.datasource.name,
-      'rate(diskio_weighted_io_time{job="telegraf", host="$%s"}[$__rate_interval]) / 1000' % [variables.host.name]
+      'rate(diskio_weighted_io_time{job="telegraf", host="$%s", name=~"$%s"}[$__rate_interval]) / 1000' % [variables.host.name, variables.disk.name]
     )
     + prometheusQuery.withRefId(id)
     + prometheusQuery.withLegendFormat('{{name}}'),
@@ -33,7 +33,23 @@ local variables = import './variables.libsonnet';
   diskLatency(type):
     prometheusQuery.new(
       '$' + variables.datasource.name,
-      'rate(diskio_%s_time{job="telegraf", host="$%s"}[$__rate_interval]) / rate(diskio_%ss{job="telegraf", host="$%s"}[$__rate_interval])' % [type, variables.host.name, type, variables.host.name]
+      'rate(diskio_%s_time{job="telegraf", host="$%s", name=~"$%s"}[$__rate_interval]) / rate(diskio_%ss{job="telegraf", host="$%s", name=~"$%s"}[$__rate_interval])' % [type, variables.host.name, variables.disk.name, type, variables.host.name, variables.disk.name]
+    )
+    + prometheusQuery.withRefId(type)
+    + prometheusQuery.withLegendFormat('{{name}}'),
+
+  diskIops(type):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'rate(diskio_%ss{job="telegraf", host="$%s", name=~"$%s"}[$__rate_interval])' % [type, variables.host.name, variables.disk.name]
+    )
+    + prometheusQuery.withRefId(type)
+    + prometheusQuery.withLegendFormat('{{name}}'),
+
+  diskThroughput(type):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'rate(diskio_%s_bytes{job="telegraf", host="$%s", name=~"$%s"}[$__rate_interval])' % [type, variables.host.name, variables.disk.name]
     )
     + prometheusQuery.withRefId(type)
     + prometheusQuery.withLegendFormat('{{name}}'),

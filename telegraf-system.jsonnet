@@ -10,6 +10,7 @@ g.dashboard.new('Telegraf / System')
   variables.datasource,
   variables.host,
   variables.cpu,
+  variables.disk,
   variables.mountpoint,
 ])
 + g.dashboard.graphTooltip.withSharedCrosshair()
@@ -108,22 +109,22 @@ g.dashboard.new('Telegraf / System')
           { target: queries.diskQueueDepth('queue_depth') },
         ], { h: 8, w: 24 }),
         panels.timeSeries.diskIops('Completed read IOPs', [
-          { target: queries.hostRateMetric('diskio_reads', 'read', '{{name}}') },
+          { target: queries.diskIops('read') },
         ], { h: 8, w: 12, y: 8 }),
         panels.timeSeries.diskLatency('Read latency', [
           { target: queries.diskLatency('read') },
         ], { h: 8, w: 12, y: 16 }),
         panels.timeSeries.diskThroughput('Read throughput', [
-          { target: queries.hostRateMetric('diskio_read_bytes', 'read', '{{name}}') },
+          { target: queries.diskThroughput('read') },
         ], { h: 8, w: 12, y: 24 }),
         panels.timeSeries.diskIops('Completed write IOPs', [
-          { target: queries.hostRateMetric('diskio_writes', 'writes', '{{name}}') },
+          { target: queries.diskIops('write') },
         ], { h: 8, w: 12, x: 12, y: 8 }),
         panels.timeSeries.diskLatency('Write latency', [
           { target: queries.diskLatency('write') },
         ], { h: 8, w: 12, x: 12, y: 16 }),
         panels.timeSeries.diskThroughput('Write throughput', [
-          { target: queries.hostRateMetric('diskio_write_bytes', 'write', '{{name}}') },
+          { target: queries.diskThroughput('write') },
         ], { h: 8, w: 12, x: 12, y: 24 }),
       ]),
 

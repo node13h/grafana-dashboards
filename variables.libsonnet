@@ -26,6 +26,17 @@ local var = g.dashboard.variable;
     + var.query.selectionOptions.withMulti(true)
     + var.query.selectionOptions.withIncludeAll(),
 
+  disk:
+    var.query.new('disk')
+    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.queryTypes.withLabelValues(
+      'name',
+      'diskio_reads{job="telegraf", host="$%s"}' % self.host.name,
+    )
+    + var.query.refresh.onTime()
+    + var.query.selectionOptions.withMulti(true)
+    + var.query.selectionOptions.withIncludeAll(),
+
   mountpoint:
     var.query.new('mountpoint')
     + var.query.withDatasourceFromVariable(self.datasource)
