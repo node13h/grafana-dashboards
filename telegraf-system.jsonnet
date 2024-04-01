@@ -14,6 +14,7 @@ g.dashboard.new('Telegraf / System')
   variables.interface,
   variables.mountpoint,
 ])
++ g.dashboard.withTags(['telegraf'])
 + g.dashboard.graphTooltip.withSharedCrosshair()
 + g.dashboard.withPanels(
   panels.normalize(
