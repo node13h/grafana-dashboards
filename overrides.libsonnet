@@ -26,8 +26,8 @@ local g = import 'github.com/grafana/grafonnet/gen/grafonnet-latest/main.libsonn
         timeSeries.standardOptions.color.withFixedColor('gray')
         + timeSeries.standardOptions.color.withMode('fixed')
         + timeSeries.fieldConfig.defaults.custom.withDrawStyle('line')
-        + timeSeries.fieldConfig.defaults.custom.lineStyle.withDash([0, 10])
-        + timeSeries.fieldConfig.defaults.custom.lineStyle.withFill('dot')
+        + timeSeries.fieldConfig.defaults.custom.lineStyle.withDash([5, 10])
+        + timeSeries.fieldConfig.defaults.custom.lineStyle.withFill('dash')
       ),
   },
 
