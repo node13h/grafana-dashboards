@@ -14,6 +14,26 @@ local var = g.dashboard.variable;
     )
     + var.query.refresh.onTime(),
 
+  hostWithMdArrays:
+    var.query.new('host')
+    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.queryTypes.withLabelValues(
+      'host',
+      'mdstat_DisksTotal{job="telegraf"}',
+    )
+    + var.query.refresh.onTime(),
+
+  mdArray:
+    var.query.new('array')
+    + var.query.withDatasourceFromVariable(self.datasource)
+    + var.query.queryTypes.withLabelValues(
+      'Name',
+      'mdstat_DisksTotal{job="telegraf", host="$%s"}' % self.hostWithMdArrays.name,
+    )
+    + var.query.refresh.onTime()
+    + var.query.selectionOptions.withMulti(true)
+    + var.query.selectionOptions.withIncludeAll(),
+
   cpu:
     var.query.new('cpu')
     + var.query.withDatasourceFromVariable(self.datasource)

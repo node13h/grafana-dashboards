@@ -95,4 +95,91 @@ local variables = import './variables.libsonnet';
     + prometheusQuery.withFormat('table')
     + prometheusQuery.withRefId(id),
 
+  mdAllArraysActive(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      |||
+        count(mdstat_DisksTotal{job="telegraf", host="$%(hostvar)s", ActivityState=~"active|checking"}) OR vector(0)
+        / count(mdstat_DisksTotal{job="telegraf", host="$%(hostvar)s"})
+      ||| % { hostvar: variables.hostWithMdArrays.name }
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withRefId(id),
+
+  mdAllArrayMembersActive(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      |||
+        sum without (Name, ActivityState) (mdstat_DisksActive{job="telegraf", host="$%(hostvar)s"})
+        / sum without (Name, ActivityState) (mdstat_DisksTotal{job="telegraf", host="$%(hostvar)s"})
+      ||| % { hostvar: variables.hostWithMdArrays.name }
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withRefId(id),
+
+  mdTotalArrays(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      |||
+        count(mdstat_DisksTotal{job="telegraf", host="$%(hostvar)s"})
+      ||| % { hostvar: variables.hostWithMdArrays.name }
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withRefId(id)
+    + prometheusQuery.withLegendFormat('total arrays'),
+
+  mdMetric(metric, id, legend=null):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'mdstat_%s{job="telegraf", Name=~"$%s", host="$%s"}' % [metric, variables.mdArray.name, variables.hostWithMdArrays.name]
+    )
+    + prometheusQuery.withRefId(id)
+    + prometheusQuery.withLegendFormat(if legend != null then legend else id),
+
+  mdStatelessMetric(metric, id, legend=null):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'max(mdstat_%s{job="telegraf", Name=~"$%s", host="$%s"}) without (ActivityState)' % [metric, variables.mdArray.name, variables.hostWithMdArrays.name]
+    )
+    + prometheusQuery.withRefId(id)
+    + prometheusQuery.withLegendFormat(if legend != null then legend else id),
+
+  mdArrayState(id):
+    self.mdMetric('DisksTotal', id, '{{ActivityState}}')
+    + prometheusQuery.withInstant(true),
+
+  mdActiveArrayMembers(id, legend=null):
+    self.mdMetric('DisksActive', id, legend)
+    + prometheusQuery.withInstant(true),
+
+  mdTotalArrayMembers(id, legend=null):
+    self.mdMetric('DisksTotal', id, legend)
+    + prometheusQuery.withInstant(true),
+
+  mdFailedArrayMembers(id):
+    self.mdMetric('DisksFailed', id)
+    + prometheusQuery.withInstant(true),
+
+  mdSyncFinishTime(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'mdstat_BlocksSyncedFinishTime{job="telegraf", Name=~"$%s", host="$%s", ActivityState!="active"}' % [variables.mdArray.name, variables.hostWithMdArrays.name]
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withRefId(id),
+
+  mdSyncSpeed(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'mdstat_BlocksSyncedSpeed{job="telegraf", Name=~"$%s", host="$%s", ActivityState!="active"}' % [variables.mdArray.name, variables.hostWithMdArrays.name]
+    )
+    + prometheusQuery.withRefId(id),
+
+  mdBlockSyncedPercentage(id):
+    prometheusQuery.new(
+      '$' + variables.datasource.name,
+      'mdstat_BlocksSyncedPct{job="telegraf", Name=~"$%s", host="$%s"} > 0' % [variables.mdArray.name, variables.hostWithMdArrays.name]
+    )
+    + prometheusQuery.withInstant(true)
+    + prometheusQuery.withRefId(id),
 }

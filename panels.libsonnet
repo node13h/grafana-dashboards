@@ -72,6 +72,45 @@ local overrides = import './overrides.libsonnet';
       { targets: [], overrides: [] }
     ),
 
+  barGauge: {
+    local barGauge = g.panel.barGauge,
+
+    base(title, fields, gridPos, options={}):
+      local f = $.splitFields(fields);
+
+      barGauge.new(title)
+      + barGauge.queryOptions.withTargets(f.targets)
+      + barGauge.panelOptions.withGridPos(
+        h=std.get(gridPos, 'h', 8),
+        w=std.get(gridPos, 'w', 8),
+        x=std.get(gridPos, 'x', 0),
+        y=std.get(gridPos, 'y', 0)
+      ),
+
+    percentage(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + barGauge.options.withDisplayMode('basic')
+      + barGauge.standardOptions.withMin(0)
+      + barGauge.standardOptions.withMax(0)
+      + barGauge.standardOptions.withUnit('percent'),
+
+    recoveryPercentage(title, fields, gridPos, options={}):
+      self.percentage(title, fields, gridPos, options=options)
+      + barGauge.options.withOrientation('vertical')
+      + barGauge.standardOptions.color.withMode('thresholds')
+      + barGauge.standardOptions.thresholds.withMode('absolute')
+      + barGauge.standardOptions.thresholds.withSteps(
+        [
+          barGauge.standardOptions.threshold.step.withColor('green')
+          + barGauge.standardOptions.threshold.step.withValue(null),
+          barGauge.standardOptions.threshold.step.withColor('yellow')
+          + barGauge.standardOptions.threshold.step.withValue(0),
+          barGauge.standardOptions.threshold.step.withColor('green')
+          + barGauge.standardOptions.threshold.step.withValue(100),
+        ]
+      ),
+  },
+
   stat: {
     local stat = g.panel.stat,
 
@@ -80,6 +119,7 @@ local overrides = import './overrides.libsonnet';
 
       stat.new(title)
       + stat.queryOptions.withTargets(f.targets)
+      + stat.options.withJustifyMode('center')
       + stat.panelOptions.withGridPos(
         h=std.get(gridPos, 'h', 8),
         w=std.get(gridPos, 'w', 8),
@@ -100,6 +140,65 @@ local overrides = import './overrides.libsonnet';
       )
       + stat.standardOptions.withUnit('dtdurations'),
 
+    horizontal(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withColorMode('none')
+      + stat.options.withOrientation('horizontal'),
+
+    vertical(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withColorMode('none')
+      + stat.options.withOrientation('vertical'),
+
+    name(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withTextMode('name')
+      + stat.options.withColorMode('none'),
+
+    numberFailures(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withColorMode('background_solid')
+      + stat.options.withTextMode('value')
+      + stat.standardOptions.color.withMode('thresholds')
+      + stat.standardOptions.thresholds.withMode('absolute')
+      + stat.standardOptions.thresholds.withSteps(
+        [
+          { color: 'green', value: null },
+          { color: 'red', value: 1 },
+        ]
+      ),
+
+    minutes(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withTextMode('value')
+      + stat.options.withColorMode('none')
+      + stat.standardOptions.withUnit('m'),
+
+    kibs(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + stat.options.withTextMode('value')
+      + stat.options.withColorMode('none')
+      + stat.standardOptions.withUnit('KiBs'),
+
+    messageMap(mappings, fields, gridPos, options={}):
+      self.base('', fields, gridPos, options=options)
+      + stat.options.withColorMode('background_solid')
+      + stat.options.withTextMode('value')
+      + stat.standardOptions.withMappings(mappings),
+
+    boolean(trueText, falseText, fields, gridPos, options={}):
+      self.messageMap([
+        g.panel.stat.standardOptions.mapping.ValueMap.withType('value')
+        + g.panel.stat.standardOptions.mapping.ValueMap.withOptions(
+          { '1': { text: trueText, color: 'green', index: 0 } }
+        ),
+        g.panel.stat.standardOptions.mapping.RangeMap.withType('range')
+        + g.panel.stat.standardOptions.mapping.RangeMap.options.withFrom(0)
+        + g.panel.stat.standardOptions.mapping.RangeMap.options.withTo(1)
+        + g.panel.stat.standardOptions.mapping.RangeMap.options.result.withIndex(1)
+        + g.panel.stat.standardOptions.mapping.RangeMap.options.result.withColor('dark-red')
+        + g.panel.stat.standardOptions.mapping.RangeMap.options.result.withText(falseText),
+      ], fields, gridPos, options=options),
   },
 
   table: {
@@ -120,7 +219,7 @@ local overrides = import './overrides.libsonnet';
       ),
 
     diskUsageSummary(title, fields, gridPos, options={}):
-      self.base(title, fields, gridPos, options)
+      self.base(title, fields, gridPos, options=options)
       + table.standardOptions.color.withMode('thresholds')
       + table.standardOptions.thresholds.withMode('absolute')
       + table.standardOptions.thresholds.withSteps(
@@ -171,6 +270,10 @@ local overrides = import './overrides.libsonnet';
         timeSeries.panelOptions.withRepeat(options.repeatField)
       else
         {},
+
+    short(title, fields, gridPos, options={}):
+      self.base(title, fields, gridPos, options=options)
+      + timeSeries.standardOptions.withUnit('short'),
 
     networkTraffic(title, fields, gridPos, options={}):
       self.base(title, fields, gridPos, options=options)
