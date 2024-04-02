@@ -39,6 +39,19 @@ Prometheus.
 
 </details>
 
+## Telegraf / MD RAID dashboard
+
+Linux MD RAID metrics collected by Telegraf into Prometheus.
+
+<details>
+<summary>Example Telegraf input plugin config</summary>
+
+```toml
+[[inputs.mdstat]]
+```
+
+</details>
+
 ## GitLab CI variables
 
 See [ci-variables.yaml](ci-variables.yaml).
